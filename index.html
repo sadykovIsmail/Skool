@@ -317,6 +317,73 @@
       overflow-y: auto;
     }
 
+    .post-composer {
+      display: grid;
+      gap: 10px;
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-bottom: 14px;
+    }
+
+    .post-composer h2 {
+      margin: 0;
+      color: #f9fafb;
+      font-size: 1.1rem;
+    }
+
+    .composer-input,
+    .composer-textarea,
+    .composer-select {
+      width: 100%;
+      background: #111827;
+      border: 1px solid #4b5563;
+      border-radius: 8px;
+      color: #e5e7eb;
+      font: inherit;
+      padding: 10px 12px;
+    }
+
+    .composer-textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .composer-input::placeholder,
+    .composer-textarea::placeholder { color: #9ca3af; }
+
+    .composer-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .composer-select { width: auto; min-width: 160px; }
+
+    .publish-post {
+      min-height: 40px;
+      padding: 8px 16px;
+      background: #2563eb;
+      border: 1px solid #3b82f6;
+      border-radius: 8px;
+      color: #ffffff;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 700;
+    }
+
+    .publish-post:hover,
+    .publish-post:focus-visible { background: #1d4ed8; outline: none; }
+
+    .composer-status {
+      min-height: 1.1rem;
+      color: #93c5fd;
+      font-size: 0.84rem;
+    }
+
     .post-card {
       background: #1f2937;
       border: 1px solid #374151;
@@ -465,7 +532,15 @@
     body.light-theme .empty-state { color: #64748b; }
     body.light-theme .video-shell { border-color: #cbd5e1; }
     body.light-theme .section-box,
-    body.light-theme .post-card { background: #ffffff; border-color: #e2e8f0; }
+    body.light-theme .post-card,
+    body.light-theme .post-composer { background: #ffffff; border-color: #e2e8f0; }
+    body.light-theme .post-composer h2 { color: #0f172a; }
+    body.light-theme .composer-input,
+    body.light-theme .composer-textarea,
+    body.light-theme .composer-select { background: #ffffff; border-color: #cbd5e1; color: #1e293b; }
+    body.light-theme .composer-input::placeholder,
+    body.light-theme .composer-textarea::placeholder { color: #94a3b8; }
+    body.light-theme .composer-status { color: #2563eb; }
     body.light-theme .description,
     body.light-theme .post-body,
     body.light-theme .comment-body { color: #334155; }
@@ -638,6 +713,15 @@
         margin-bottom: 14px;
       }
 
+      .post-composer {
+        border-radius: 12px;
+        padding: 15px;
+      }
+
+      .composer-actions { align-items: stretch; }
+      .composer-select,
+      .publish-post { width: 100%; min-height: 44px; }
+
       .post-header,
       .post-stats {
         flex-wrap: wrap;
@@ -679,6 +763,18 @@
 
   <div id="community-view" class="view">
     <div id="feed-container">
+      <form id="post-composer" class="post-composer">
+        <h2>Start a discussion</h2>
+        <input id="new-post-title" class="composer-input" type="text" maxlength="160" placeholder="Post title (optional)" aria-label="Post title" />
+        <textarea id="new-post-content" class="composer-textarea" maxlength="10000" placeholder="Share a question, win, or useful resource…" aria-label="Post content" required></textarea>
+        <div class="composer-actions">
+          <select id="new-post-category" class="composer-select" aria-label="Post category">
+            <option value="general">General</option>
+          </select>
+          <button class="publish-post" type="submit">Publish post</button>
+        </div>
+        <div id="composer-status" class="composer-status" aria-live="polite"></div>
+      </form>
       <div id="community-toolbar" style="display:flex; gap:12px; justify-content:space-between; align-items:center; margin: 20px auto 10px; max-width: 900px; padding: 0 18px; flex-wrap: wrap;">
         <input id="post-search" class="community-search" type="search" placeholder="Search posts" aria-label="Search community posts" />
         <select id="post-sort" style="background:#1f2937; color:#e5e7eb; border:1px solid #374151; border-radius:8px; padding:8px 12px; min-width:170px;">
@@ -707,6 +803,7 @@
       expandedCourse: null,
       selectedLessonId: null,
       expandedPostIds: new Set(),
+      localPosts: getLocalPosts(),
       theme: getSavedTheme()
     };
 
@@ -715,6 +812,25 @@
         return localStorage.getItem('theme') === 'light' ? 'light' : 'dark';
       } catch {
         return 'dark';
+      }
+    }
+
+    function getLocalPosts() {
+      try {
+        const saved = JSON.parse(localStorage.getItem('communityPosts') || '[]');
+        return Array.isArray(saved) ? saved.filter(post => post && post.postId && post.content) : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveLocalPosts() {
+      try {
+        localStorage.setItem('communityPosts', JSON.stringify(state.localPosts));
+        return true;
+      } catch (error) {
+        console.error('Could not save community posts', error);
+        return false;
       }
     }
 
@@ -801,7 +917,7 @@
           .filter(Boolean)
           .filter(post => !feedPosts.some(p => p.postId === post.postId));
 
-        state.posts = [...feedPosts, ...embeddedPosts];
+        state.posts = [...state.localPosts, ...feedPosts, ...embeddedPosts];
         state.expandedCourse = state.lessons[0]?.course || null;
         state.selectedLessonId = state.lessons[0]?.lessonId || null;
         bindCommunityControls();
@@ -983,7 +1099,8 @@
       const sortEl = document.getElementById('post-sort');
       const filterEl = document.getElementById('post-filter');
       const searchEl = document.getElementById('post-search');
-      if (!sortEl || !filterEl || !searchEl) return;
+      const composer = document.getElementById('post-composer');
+      if (!sortEl || !filterEl || !searchEl || !composer) return;
 
       sortEl.onchange = () => {
         state.postSort = sortEl.value;
@@ -1002,6 +1119,54 @@
         state.visiblePostCount = 30;
         renderCommunity();
       };
+
+      composer.onsubmit = event => {
+        event.preventDefault();
+        createCommunityPost();
+      };
+    }
+
+    function createCommunityPost() {
+      const titleEl = document.getElementById('new-post-title');
+      const contentEl = document.getElementById('new-post-content');
+      const categoryEl = document.getElementById('new-post-category');
+      const statusEl = document.getElementById('composer-status');
+      const content = contentEl?.value.trim();
+
+      if (!content) {
+        if (statusEl) statusEl.textContent = 'Write something before publishing.';
+        contentEl?.focus();
+        return;
+      }
+
+      const newPost = {
+        type: 'feedPost',
+        postId: `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        title: titleEl?.value.trim() || 'Untitled post',
+        content,
+        author: { fullName: 'You' },
+        createdAt: new Date().toISOString(),
+        labelId: categoryEl?.value === 'general' ? null : categoryEl?.value,
+        upvotes: 0,
+        commentsCount: 0,
+        comments: [],
+        attachments: [],
+        links: []
+      };
+
+      state.localPosts.unshift(newPost);
+      state.posts.unshift(newPost);
+      const saved = saveLocalPosts();
+      if (titleEl) titleEl.value = '';
+      if (contentEl) contentEl.value = '';
+      state.postSearch = '';
+      const searchEl = document.getElementById('post-search');
+      if (searchEl) searchEl.value = '';
+      state.postFilter = 'all';
+      state.postSort = 'newest';
+      state.visiblePostCount = 30;
+      if (statusEl) statusEl.textContent = saved ? 'Post published in this browser.' : 'Post added, but browser storage is unavailable.';
+      renderCommunity();
     }
 
     // Mapping of labelIds to friendly category names
@@ -1126,12 +1291,22 @@
       });
 
       if (filterEl) {
-        const current = filterEl.value;
         filterEl.innerHTML = '<option value="all">All posts</option>' + Object.entries(categoryMap)
           .sort((a, b) => b[1].count - a[1].count)
           .map(([key, meta]) => `<option value="${escapeHtml(key)}">${escapeHtml(meta.label)} (${meta.count})</option>`)
           .join('');
-        filterEl.value = current && categoryMap[current] ? current : state.postFilter;
+        filterEl.value = state.postFilter && categoryMap[state.postFilter] ? state.postFilter : 'all';
+      }
+
+      const composerCategoryEl = document.getElementById('new-post-category');
+      if (composerCategoryEl) {
+        const currentCategory = composerCategoryEl.value;
+        composerCategoryEl.innerHTML = '<option value="general">General</option>' + Object.entries(categoryMap)
+          .filter(([key]) => key !== 'general')
+          .sort((a, b) => a[1].label.localeCompare(b[1].label))
+          .map(([key, meta]) => `<option value="${escapeHtml(key)}">${escapeHtml(meta.label)}</option>`)
+          .join('');
+        composerCategoryEl.value = currentCategory && (currentCategory === 'general' || categoryMap[currentCategory]) ? currentCategory : 'general';
       }
 
       const sorted = getFilteredSortedPosts();
