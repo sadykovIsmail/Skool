@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SWE Accelerator Platform</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #111827;
+      color: #e5e7eb;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: #1f2937;
+      border-bottom: 1px solid #374151;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      height: 64px;
+      flex-shrink: 0;
+    }
+
+    .brand {
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      color: #f9fafb;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 10px;
+    }
+
+    .tab-btn {
+      background: transparent;
+      color: #9ca3af;
+      border: none;
+      border-bottom: 2px solid transparent;
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn.active {
+      color: #60a5fa;
+      border-bottom-color: #60a5fa;
+    }
+
+    .theme-toggle {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      background: #111827;
+      border: 1px solid #4b5563;
+      border-radius: 10px;
+      color: #fbbf24;
+      cursor: pointer;
+      font-size: 1.1rem;
+    }
+
+    .theme-toggle:hover,
+    .theme-toggle:focus-visible {
+      border-color: #60a5fa;
+      outline: none;
+    }
+
+    .view {
+      display: none;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .view.active {
+      display: flex;
+    }
+
+    #sidebar {
+      width: 320px;
+      background: #0f172a;
+      border-right: 1px solid #374151;
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    .course-group {
+      background: rgba(31, 41, 55, 0.55);
+      border: 1px solid #374151;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+
+    .course-toggle {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 700;
+      padding: 12px;
+      text-align: left;
+    }
+
+    .course-toggle::after {
+      content: '⌄';
+      color: #60a5fa;
+      font-size: 1rem;
+      line-height: 1;
+      transition: transform 0.2s ease;
+    }
+
+    .course-toggle[aria-expanded="true"]::after {
+      transform: rotate(180deg);
+    }
+
+    .course-toggle:hover,
+    .course-toggle:focus-visible {
+      background: rgba(96, 165, 250, 0.1);
+      color: #dbeafe;
+      outline: none;
+    }
+
+    .course-lessons {
+      border-top: 1px solid #374151;
+      padding: 8px 8px 0;
+    }
+
+    .lesson-item {
+      display: block;
+      width: 100%;
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      font-size: 0.92rem;
+      font-family: inherit;
+      text-align: left;
+      color: #e5e7eb;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .lesson-item:hover {
+      background: #374151;
+    }
+
+    .lesson-item.active {
+      background: rgba(37, 99, 235, 0.24);
+      border-color: #60a5fa;
+      color: #eff6ff;
+    }
+
+    #lesson-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 28px;
+      background: #111827;
+    }
+
+    .lesson-panel {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    #lesson-title {
+      font-size: clamp(1.5rem, 2vw, 2.4rem);
+      font-weight: 800;
+      margin-bottom: 14px;
+      color: #f9fafb;
+    }
+
+    #lesson-subtitle {
+      color: #94a3b8;
+      font-size: 0.9rem;
+      margin-bottom: 16px;
+    }
+
+    .video-shell {
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      min-height: 240px;
+      border: 1px solid #374151;
+      margin-bottom: 18px;
+    }
+
+    .video-shell iframe,
+    .video-shell video {
+      display: block;
+      width: 100%;
+      min-height: 240px;
+      max-height: 480px;
+      aspect-ratio: 16 / 9;
+      border: none;
+      background: #000;
+    }
+
+    .section-box {
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin-top: 18px;
+    }
+
+    .section-box h3 {
+      margin: 0 0 12px;
+      font-size: 1rem;
+      color: #f9fafb;
+    }
+
+    .description {
+      color: #d1d5db;
+      line-height: 1.75;
+      white-space: pre-wrap;
+    }
+
+    .chapter-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 8px;
+    }
+
+    .chapter-item {
+      padding: 8px 10px;
+      background: rgba(148, 163, 184, 0.06);
+      border-radius: 8px;
+      color: #dbeafe;
+    }
+
+    .chapter-time {
+      color: #60a5fa;
+      font-weight: 700;
+      margin-right: 10px;
+    }
+
+    .resource-list,
+    .attachment-list,
+    .comment-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .resource-item,
+    .attachment-item,
+    .comment-item {
+      background: rgba(148, 163, 184, 0.05);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+
+    .resource-item a,
+    .attachment-item a {
+      color: #93c5fd;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .resource-item a:hover,
+    .attachment-item a:hover {
+      text-decoration: underline;
+    }
+
+    .resource-meta,
+    .attachment-meta,
+    .comment-meta {
+      color: #9ca3af;
+      font-size: 0.8rem;
+      margin-top: 6px;
+    }
+
+    .comment-item strong {
+      color: #f3f4f6;
+    }
+
+    .comment-body {
+      color: #d1d5db;
+      line-height: 1.6;
+      margin-top: 8px;
+      white-space: pre-wrap;
+    }
+
+    #feed-container {
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 26px 18px;
+      overflow-y: auto;
+    }
+
+    .post-card {
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-bottom: 18px;
+    }
+
+    .post-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .author-name {
+      font-weight: 700;
+      color: #f9fafb;
+    }
+
+    .post-date {
+      color: #9ca3af;
+      font-size: 0.78rem;
+    }
+
+    .post-title {
+      margin: 8px 0 12px;
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #f9fafb;
+    }
+
+    .post-body {
+      color: #d1d5db;
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+
+    .post-more {
+      display: inline-flex;
+      align-items: center;
+      min-height: 36px;
+      margin-top: 6px;
+      padding: 4px 0;
+      background: transparent;
+      border: none;
+      color: #93c5fd;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 700;
+    }
+
+    .post-more:hover,
+    .post-more:focus-visible {
+      color: #dbeafe;
+      text-decoration: underline;
+      outline: none;
+    }
+
+    .community-search {
+      min-height: 40px;
+      min-width: 220px;
+      padding: 8px 12px;
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 8px;
+      color: #e5e7eb;
+      font: inherit;
+    }
+
+    .community-search::placeholder { color: #9ca3af; }
+
+    .copy-posts {
+      min-height: 40px;
+      padding: 8px 12px;
+      background: #2563eb;
+      border: 1px solid #3b82f6;
+      border-radius: 8px;
+      color: #ffffff;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 700;
+    }
+
+    .copy-posts:hover,
+    .copy-posts:focus-visible { background: #1d4ed8; outline: none; }
+
+    .post-stats {
+      margin-top: 12px;
+      display: flex;
+      gap: 18px;
+      font-size: 0.82rem;
+      color: #9ca3af;
+      border-top: 1px solid #374151;
+      padding-top: 12px;
+    }
+
+    .empty-state {
+      color: #9ca3af;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    /* Light theme */
+    body.light-theme {
+      background: #f8fafc;
+      color: #1e293b;
+    }
+
+    body.light-theme header {
+      background: #ffffff;
+      border-color: #e2e8f0;
+    }
+
+    body.light-theme .brand,
+    body.light-theme #lesson-title,
+    body.light-theme .section-box h3,
+    body.light-theme .author-name,
+    body.light-theme .post-title,
+    body.light-theme .comment-item strong {
+      color: #0f172a;
+    }
+
+    body.light-theme .tab-btn { color: #64748b; }
+    body.light-theme .tab-btn.active { color: #2563eb; border-bottom-color: #2563eb; }
+    body.light-theme .theme-toggle { background: #f8fafc; border-color: #cbd5e1; color: #475569; }
+
+    body.light-theme #sidebar { background: #f1f5f9; border-color: #cbd5e1; }
+    body.light-theme .course-group { background: #ffffff; border-color: #cbd5e1; }
+    body.light-theme .course-toggle { color: #475569; }
+    body.light-theme .course-toggle:hover,
+    body.light-theme .course-toggle:focus-visible { background: #eff6ff; color: #1d4ed8; }
+    body.light-theme .course-lessons { border-color: #e2e8f0; }
+    body.light-theme .lesson-item { background: #ffffff; border-color: #cbd5e1; color: #1e293b; }
+    body.light-theme .lesson-item:hover { background: #f1f5f9; }
+    body.light-theme .lesson-item.active { background: #dbeafe; border-color: #3b82f6; color: #1e3a8a; }
+
+    body.light-theme #lesson-content { background: #f8fafc; }
+    body.light-theme #lesson-subtitle,
+    body.light-theme .resource-meta,
+    body.light-theme .attachment-meta,
+    body.light-theme .comment-meta,
+    body.light-theme .post-date,
+    body.light-theme .post-stats,
+    body.light-theme .empty-state { color: #64748b; }
+    body.light-theme .video-shell { border-color: #cbd5e1; }
+    body.light-theme .section-box,
+    body.light-theme .post-card { background: #ffffff; border-color: #e2e8f0; }
+    body.light-theme .description,
+    body.light-theme .post-body,
+    body.light-theme .comment-body { color: #334155; }
+    body.light-theme .chapter-item,
+    body.light-theme .resource-item,
+    body.light-theme .attachment-item,
+    body.light-theme .comment-item { background: #f8fafc; border-color: #e2e8f0; }
+    body.light-theme .chapter-item { color: #1e3a8a; }
+    body.light-theme .resource-item a,
+    body.light-theme .attachment-item a,
+    body.light-theme .post-more { color: #2563eb; }
+    body.light-theme .post-stats { border-color: #e2e8f0; }
+    body.light-theme #post-sort,
+    body.light-theme #post-filter,
+    body.light-theme .community-search { background: #ffffff !important; color: #1e293b !important; border-color: #cbd5e1 !important; }
+    body.light-theme .community-search::placeholder { color: #94a3b8; }
+
+    @media (max-width: 900px) {
+      html, body {
+        height: auto;
+        min-height: 100%;
+      }
+
+      body { display: block; }
+
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+
+      .view {
+        min-height: calc(100vh - 64px);
+      }
+
+      .view.active { display: block; }
+
+      #sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #374151;
+        max-height: 38vh;
+        overscroll-behavior: contain;
+      }
+
+      #lesson-content,
+      #feed-container {
+        overflow: visible;
+      }
+
+      #lesson-content { scroll-margin-top: 72px; }
+    }
+
+    @media (max-width: 600px) {
+      header {
+        min-height: 56px;
+        height: auto;
+        padding: 0 12px;
+      }
+
+      .brand {
+        font-size: 0.9rem;
+        white-space: nowrap;
+      }
+
+      .header-actions { gap: 2px; }
+
+      .nav-tabs { gap: 0; }
+
+      .tab-btn {
+        min-height: 48px;
+        padding: 12px 7px;
+        font-size: 0.84rem;
+      }
+
+      .theme-toggle {
+        width: 38px;
+        height: 38px;
+      }
+
+      .view { min-height: calc(100vh - 56px); }
+
+      #sidebar {
+        max-height: 34vh;
+        padding: 10px 12px 12px;
+      }
+
+      .course-group { margin-bottom: 8px; }
+
+      .course-toggle {
+        padding: 11px 12px;
+        font-size: 0.68rem;
+      }
+
+      .course-lessons { padding: 7px 7px 0; }
+
+      .lesson-item {
+        min-height: 44px;
+        padding: 11px 12px;
+        margin-bottom: 7px;
+        font-size: 0.9rem;
+      }
+
+      #lesson-content { padding: 18px 14px 28px; }
+
+      #lesson-title {
+        font-size: 1.45rem;
+        line-height: 1.2;
+        margin: 0 0 10px;
+      }
+
+      #lesson-subtitle {
+        line-height: 1.45;
+        margin-bottom: 12px;
+      }
+
+      .video-shell {
+        min-height: 0;
+        aspect-ratio: 16 / 9;
+        border-radius: 10px;
+        margin-bottom: 14px;
+      }
+
+      .video-shell iframe,
+      .video-shell video {
+        min-height: 0;
+        height: 100%;
+        max-height: none;
+      }
+
+      .section-box {
+        border-radius: 10px;
+        padding: 15px;
+        margin-top: 14px;
+      }
+
+      .description,
+      .post-body,
+      .comment-body {
+        line-height: 1.65;
+        overflow-wrap: anywhere;
+      }
+
+      .resource-item,
+      .attachment-item,
+      .comment-item {
+        padding: 11px 12px;
+        overflow-wrap: anywhere;
+      }
+
+      #feed-container { padding: 14px 12px 24px; }
+
+      #community-toolbar {
+        margin: 4px 0 12px !important;
+        padding: 0 !important;
+        gap: 8px !important;
+      }
+
+      #community-toolbar select,
+      #community-toolbar .community-search,
+      #community-toolbar .copy-posts {
+        width: 100%;
+        min-height: 44px;
+        flex: 1 1 100%;
+      }
+
+      .post-card {
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 14px;
+      }
+
+      .post-header,
+      .post-stats {
+        flex-wrap: wrap;
+        gap: 8px 12px;
+      }
+
+      .post-title {
+        font-size: 1.15rem;
+        line-height: 1.3;
+      }
+
+      .empty-state { padding: 28px 14px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">SWE Accelerator</div>
+    <div class="header-actions">
+      <div class="nav-tabs">
+        <button class="tab-btn active" type="button" onclick="switchTab('classroom')">Classroom</button>
+        <button class="tab-btn" type="button" onclick="switchTab('community')">Community</button>
+      </div>
+      <button id="theme-toggle" class="theme-toggle" type="button" onclick="toggleTheme()" aria-label="Switch to light theme" title="Switch to light theme">☀️</button>
+    </div>
+  </header>
+
+  <div id="classroom-view" class="view active">
+    <aside id="sidebar"></aside>
+    <main id="lesson-content">
+      <div class="lesson-panel">
+        <h2 id="lesson-title">Select a lesson</h2>
+        <div id="lesson-subtitle"></div>
+        <div id="video-shell" class="video-shell"></div>
+        <div id="lesson-description" class="description"></div>
+      </div>
+    </main>
+  </div>
+
+  <div id="community-view" class="view">
+    <div id="feed-container">
+      <div id="community-toolbar" style="display:flex; gap:12px; justify-content:space-between; align-items:center; margin: 20px auto 10px; max-width: 900px; padding: 0 18px; flex-wrap: wrap;">
+        <input id="post-search" class="community-search" type="search" placeholder="Search posts" aria-label="Search community posts" />
+        <select id="post-sort" style="background:#1f2937; color:#e5e7eb; border:1px solid #374151; border-radius:8px; padding:8px 12px; min-width:170px;">
+          <option value="newest">Newest</option>
+          <option value="upvotes">Most upvoted</option>
+          <option value="comments">Most comments</option>
+        </select>
+        <select id="post-filter" style="background:#1f2937; color:#e5e7eb; border:1px solid #374151; border-radius:8px; padding:8px 12px; min-width:180px;">
+          <option value="all">All posts</option>
+        </select>
+        <button id="copy-posts" class="copy-posts" type="button" onclick="copyCommunityPosts()">Copy all posts</button>
+      </div>
+      <div id="posts-list"></div>
+      <div id="posts-more" style="max-width:900px; margin: 0 auto 24px; padding: 0 18px; display:none; text-align:center;"></div>
+    </div>
+  </div>
+
+  <script>
+    const state = {
+      lessons: [],
+      posts: [],
+      postSort: 'newest',
+      postFilter: 'all',
+      postSearch: '',
+      visiblePostCount: 30,
+      expandedCourse: null,
+      selectedLessonId: null,
+      expandedPostIds: new Set(),
+      theme: getSavedTheme()
+    };
+
+    function getSavedTheme() {
+      try {
+        return localStorage.getItem('theme') === 'light' ? 'light' : 'dark';
+      } catch {
+        return 'dark';
+      }
+    }
+
+    function applyTheme(theme) {
+      const isLight = theme === 'light';
+      document.body.classList.toggle('light-theme', isLight);
+      const toggle = document.getElementById('theme-toggle');
+      if (toggle) {
+        toggle.textContent = isLight ? '🌙' : '☀️';
+        toggle.setAttribute('aria-label', isLight ? 'Switch to dark theme' : 'Switch to light theme');
+        toggle.title = isLight ? 'Switch to dark theme' : 'Switch to light theme';
+      }
+    }
+
+    function toggleTheme() {
+      state.theme = state.theme === 'light' ? 'dark' : 'light';
+      applyTheme(state.theme);
+      try {
+        localStorage.setItem('theme', state.theme);
+      } catch {
+        // Theme switching still works when browser storage is unavailable.
+      }
+    }
+
+    applyTheme(state.theme);
+
+    // Cloudflare R2 public bucket. Video object names are the exact keys uploaded from /videos.
+    const R2_BASE_URL = 'https://pub-28b2e97c3ab5424598c48c9595e16a58.r2.dev';
+    const R2_VIDEO_FILES_BY_LESSON_ID = {
+      '861faa92050e47bfa1c4fc90da36f56c': 'video-video-lesson-861faa92050e47bf-4165fe.mp4',
+      '32982ff49544407ca34d0e032e60533b': 'video-video-lesson-32982ff49544407c-097288.mp4',
+      'ca86d6617146496483d2665260ba062c': 'video-video-lesson-ca86d66171464964-99b38c.mp4',
+      'b309437b19ca4ec692893b2b8de0a7da': 'video-video-lesson-b309437b19ca4ec6-30d2a1.mp4',
+      '28dbe875c2e6445499efdc9594e1fa11': 'video-video-lesson-28dbe875c2e64454-b643ce.mp4',
+      'd628c6fbf271457ab2d6ec1a1a93e5bd': 'video-video-lesson-d628c6fbf271457a-f12550.mp4',
+      '5fa8c967ddd24ca7892af9504c02dc2f': 'video-video-lesson-5fa8c967ddd24ca7-7ace17.mp4',
+      'd3dffd020ec845cbbeb3182466287857': 'video-video-lesson-d3dffd020ec845cb-43dfa9.mp4',
+      'b29d92d5e1f24bf4bc6e8d8b6b2e4ec1': 'video-video-lesson-b29d92d5e1f24bf4-552330.mp4',
+      '5c3edf3f65c6432983c8994736c88b4a': 'video-video-lesson-5c3edf3f65c64329-0a7c7c.mp4',
+      'c6a2176272d24563bc53488ded94ce76': 'video-video-lesson-c6a2176272d24563-9ee80b.mp4',
+      '0a98e69cc33440dbb27d7109c14d49e2': 'video-video-lesson-0a98e69cc33440db-f19930.mp4',
+      'd0a03e2d49254df19d422e07596ba38b': 'video-video-lesson-d0a03e2d49254df1-0c1e1e.mp4',
+      '45ecca65ff734df18b26785b23c0738b': 'video-video-lesson-45ecca65ff734df1-b28243.mp4',
+      'a46955edb8e74ca585f5df09b74be0bf': 'video-video-lesson-a46955edb8e74ca5-fb8e16.mp4',
+      '5fe5199f70df447ca08bc135ea6255e1': 'video-video-lesson-5fe5199f70df447c-8efd30.mp4',
+      '6fe6de6dd37244109ea583ba47d0bf17': 'video-video-lesson-6fe6de6dd3724410-37f5ef.mp4'
+    };
+    const R2_VIDEO_FILES_BY_LESSON_TITLE = {
+      'Accelerator Overwhelm': 'FIXED_Accelerator Overwhelm.mp4',
+      'Application Cartography': 'FIXED_APPLICATION CARTOGRAPHY.mp4',
+      'Behavioral Interview Blueprint': 'FIXED_Behavioral Interview Blueprint_2.mp4',
+      'Conquer Career Fairs': 'FIXED_Career Fairs_1.mp4',
+      'Coding Interview Mastery': 'FIXED_Coding Interview Mastery.mp4',
+      'Putting It All Together': 'FIXED_Conclusion.mp4',
+      'Experience Alchemy (Micro-Internship System)': 'FIXED_EXPERIENCE ALCHEMY.mp4',
+      'Interview Cartography': 'FIXED_Interview Cartography_2.mp4',
+      'Interview Mindset': 'FIXED_Interview Mindset.mp4',
+      'Money Grows On Trees: Networking 101': 'FIXED_Networking 101-2.mp4',
+      'Refer and Earn': 'FIXED_Refer & Earn!.mp4',
+      'The 19 Laws of LinkedIn': 'FIXED_The 19 Laws of LinkedIn.mp4',
+      'Write A Top 1% Resume': 'FIXED_Write A Top 1% Resume.mp4',
+      'LeetCode Guide': 'The Unfair Way I Got Good At LeetCode.mp4',
+      'Leveraging Blind For Referrals': 'How I Got 100+ FAANG Referrals With No Connections (Software Engineering).mp4',
+      'Understanding the API Between You & The Recruiter': 'Understanding the API Between You and the Recruiter.mp4',
+      'Your Guide to the ATS Game Plan': '� Recruiter Q&A with Yvonne and Jon_ Your Guide to the ATS Game Plan � 6fae3f5c-b6e3-4e12-a35e-4057262f1cf6.mp4'
+    };
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.toggle('active', btn.textContent.toLowerCase().includes(tab)));
+      document.getElementById('classroom-view').classList.toggle('active', tab === 'classroom');
+      document.getElementById('community-view').classList.toggle('active', tab === 'community');
+    }
+
+    fetch('export.json')
+      .then(res => {
+        if (!res.ok) throw new Error('Could not load export.json');
+        return res.json();
+      })
+      .then(data => {
+        state.lessons = (data || []).filter(item => item && item.type === 'lesson');
+        const feedPosts = (data || []).filter(item => item && item.type === 'feedPost');
+        const embeddedPosts = state.lessons
+          .map(item => item.post)
+          .filter(Boolean)
+          .filter(post => !feedPosts.some(p => p.postId === post.postId));
+
+        state.posts = [...feedPosts, ...embeddedPosts];
+        state.expandedCourse = state.lessons[0]?.course || null;
+        state.selectedLessonId = state.lessons[0]?.lessonId || null;
+        bindCommunityControls();
+        renderSidebar();
+        renderCommunity();
+        if (state.lessons[0]) loadLesson(state.lessons[0]);
+      })
+      .catch(err => {
+        document.getElementById('sidebar').innerHTML = '<div class="empty-state">Unable to load export.json. Please make sure it is in the same folder as this page.</div>';
+        document.getElementById('posts-list').innerHTML = '<div class="empty-state">Unable to load community data.</div>';
+        console.error(err);
+      });
+
+    function renderSidebar() {
+      const tree = {};
+      state.lessons.forEach(lesson => {
+        const course = lesson.course || 'General';
+        if (!tree[course]) tree[course] = [];
+        tree[course].push(lesson);
+      });
+
+      const sidebar = document.getElementById('sidebar');
+      sidebar.innerHTML = '';
+
+      Object.entries(tree).forEach(([courseName, lessons]) => {
+        const isExpanded = state.expandedCourse === courseName;
+        const group = document.createElement('section');
+        group.className = 'course-group';
+
+        const courseToggle = document.createElement('button');
+        courseToggle.type = 'button';
+        courseToggle.className = 'course-toggle';
+        courseToggle.textContent = courseName;
+        courseToggle.setAttribute('aria-expanded', String(isExpanded));
+        courseToggle.onclick = () => {
+          state.expandedCourse = isExpanded ? null : courseName;
+          renderSidebar();
+        };
+        group.appendChild(courseToggle);
+
+        const lessonList = document.createElement('div');
+        lessonList.className = 'course-lessons';
+        lessonList.hidden = !isExpanded;
+
+        lessons.forEach(lesson => {
+          const item = document.createElement('button');
+          item.type = 'button';
+          item.className = 'lesson-item';
+          item.classList.toggle('active', lesson.lessonId === state.selectedLessonId);
+          item.textContent = lesson.lesson;
+          item.onclick = () => {
+            state.selectedLessonId = lesson.lessonId;
+            loadLesson(lesson);
+            sidebar.querySelectorAll('.lesson-item').forEach(button => button.classList.remove('active'));
+            item.classList.add('active');
+            if (window.matchMedia('(max-width: 900px)').matches) {
+              document.getElementById('lesson-content').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          };
+          lessonList.appendChild(item);
+        });
+
+        group.appendChild(lessonList);
+        sidebar.appendChild(group);
+      });
+    }
+
+    function loadLesson(lesson) {
+      const title = document.getElementById('lesson-title');
+      const subtitle = document.getElementById('lesson-subtitle');
+      const videoShell = document.getElementById('video-shell');
+      const descriptionEl = document.getElementById('lesson-description');
+
+      title.textContent = lesson.lesson || 'Untitled lesson';
+      subtitle.textContent = `${lesson.course || 'Course'} • ${lesson.section || 'Section'}`;
+
+      const embed = buildVideoEmbed(lesson);
+      videoShell.innerHTML = embed || '<div class="empty-state" style="padding: 30px;">No video available for this lesson.</div>';
+
+      const description = lesson.descriptionText || lesson.descriptionRaw || 'No description available.';
+      const chapters = extractChapters(description);
+      const richLinks = extractRichTextLinks(lesson.descriptionRaw || lesson.descriptionText || '');
+      const resources = [...(lesson.resources || []), ...richLinks];
+
+      let html = `<div class="section-box"><h3>Lesson description</h3><div class="description">${escapeHtml(description)}</div></div>`;
+
+      if (chapters.length) {
+        html += `<div class="section-box"><h3>Video chapters</h3><ul class="chapter-list">${chapters.map(ch => `<li class="chapter-item"><span class="chapter-time">${escapeHtml(ch.time)}</span>${escapeHtml(ch.title)}</li>`).join('')}</ul></div>`;
+      }
+
+      if (resources.length) {
+        html += `<div class="section-box"><h3>Resources</h3><div class="resource-list">${resources.map(r => {
+          const url = r.url || resolveResourceUrl(r, true);
+          const label = r.title || r.fileName || r.name || 'Resource';
+          const meta = [r.platform, r.fileType, r.fileName].filter(Boolean).join(' • ');
+          const safeUrl = (url && url !== '#') ? url : '#';
+          return `<div class="resource-item"><a href="${safeUrl}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a><div class="resource-meta">${escapeHtml(meta || (r.url ? 'External link' : 'Resource'))}</div></div>`;
+        }).join('')}</div></div>`;
+      }
+
+      if (lesson.post) {
+        const post = lesson.post;
+        html += `<div class="section-box"><h3>Linked community post</h3><div class="resource-item"><a href="#" onclick="event.preventDefault(); openPost('${post.postId}')">${escapeHtml(post.title || 'View post')}</a><div class="resource-meta">${escapeHtml(post.author?.fullName || 'Community member')} • ${post.commentsCount || 0} comments</div></div></div>`;
+      }
+
+      descriptionEl.innerHTML = html;
+    }
+
+    function buildVideoEmbed(lesson) {
+      const hosted = lesson.hostedVideo;
+      const alt = lesson.lessonVideo;
+      const r2VideoUrl = resolveR2VideoUrl(lesson);
+
+      // R2 is the primary source for every video uploaded to the public bucket.
+      if (r2VideoUrl) {
+        return `<video controls playsinline preload="metadata" src="${r2VideoUrl}"></video>`;
+      }
+
+      // Fallbacks cover lessons that do not have a matching R2 upload.
+      if (hosted && hosted.direct_download) {
+        return `<video controls preload="metadata" loading="lazy" src="${normalizePreviewUrl(hosted.direct_download)}"></video>`;
+      }
+
+      if (hosted && hosted.downloadUrl) {
+        return `<video controls preload="metadata" loading="lazy" src="${normalizePreviewUrl(hosted.downloadUrl)}"></video>`;
+      }
+
+      if (hosted && hosted.playbackUrl) {
+        return `<iframe src="${normalizePreviewUrl(hosted.playbackUrl)}" loading="lazy" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
+      }
+
+      if (alt && alt.platform === 'youtube') {
+        const match = (alt.url || '').match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+        const id = match ? match[1] : '';
+        return id ? `<iframe src="https://www.youtube.com/embed/${id}" loading="lazy" allowfullscreen></iframe>` : '';
+      }
+
+      if (alt && alt.platform === 'vimeo') {
+        const match = (alt.url || '').match(/vimeo\.com\/(\d+)/);
+        const id = match ? match[1] : '';
+        return id ? `<iframe src="https://player.vimeo.com/video/${id}" loading="lazy" allowfullscreen></iframe>` : '';
+      }
+
+      if (alt && alt.platform === 'loom') {
+        const match = (alt.url || '').match(/loom\.com\/share\/([a-zA-Z0-9]+)/);
+        const id = match ? match[1] : '';
+        return id ? `<iframe src="https://www.loom.com/embed/${id}" loading="lazy" allowfullscreen></iframe>` : '';
+      }
+
+      return '';
+    }
+
+    function resolveR2VideoUrl(lesson) {
+      const fileName = lesson.videoFileName
+        || lesson.hostedVideo?.fileName
+        || R2_VIDEO_FILES_BY_LESSON_ID[lesson.lessonId]
+        || R2_VIDEO_FILES_BY_LESSON_TITLE[lesson.lesson];
+
+      if (!fileName) return null;
+
+      // Encode each path segment so spaces, ampersands, and non-ASCII characters load correctly.
+      const encodedFileName = String(fileName).split('/').map(encodeURIComponent).join('/');
+      return `${R2_BASE_URL}/${encodedFileName}`;
+    }
+
+    function extractChapters(text) {
+      const lines = (text || '').split(/\r?\n/);
+      const chapters = [];
+      for (const line of lines) {
+        const match = line.match(/^(\d{1,2}:\d{2}(?::\d{2})?)\s+(.+)$/);
+        if (match) {
+          chapters.push({ time: match[1], title: match[2].trim() });
+        }
+      }
+      return chapters.slice(0, 12);
+    }
+
+    function bindCommunityControls() {
+      const sortEl = document.getElementById('post-sort');
+      const filterEl = document.getElementById('post-filter');
+      const searchEl = document.getElementById('post-search');
+      if (!sortEl || !filterEl || !searchEl) return;
+
+      sortEl.onchange = () => {
+        state.postSort = sortEl.value;
+        state.visiblePostCount = 30;
+        renderCommunity();
+      };
+
+      filterEl.onchange = () => {
+        state.postFilter = filterEl.value;
+        state.visiblePostCount = 30;
+        renderCommunity();
+      };
+
+      searchEl.oninput = () => {
+        state.postSearch = searchEl.value;
+        state.visiblePostCount = 30;
+        renderCommunity();
+      };
+    }
+
+    // Mapping of labelIds to friendly category names
+    const CATEGORY_NAMES = {
+      '56330da80d8b4f948f7f4bd21d545a3c': 'LinkedIn',
+      'b77edc045eb041d4a5c5b9711ac1c19d': 'Introductions',
+      '2c46a7a058b34b1a9cffc547ad265d68': 'LeetCode',
+      'b0484f05fab54c34a6c16a11543a3d61': 'Interviews',
+      '6aba088a2aa14ebb815fae47ea2751ba': 'Offers',
+      '6878879ba6954df39aa3964a1142f9d8': 'Applications',
+      '9637844de5b14f1bbab64279efcc0e21': 'Referrals',
+      '3f979071c12740cc9c298bf90336dc78': 'Prep Groups',
+      'cce9b52b495e4f34ba4de630175d3445': 'Office Hours'
+    };
+
+    function getPostCategory(post) {
+      if (!post || !post.labelId) return 'general';
+      return String(post.labelId).trim() || 'general';
+    }
+
+    function getCategoryLabel(labelId) {
+      return CATEGORY_NAMES[labelId] || `Category ${String(labelId).slice(0, 6)}`;
+    }
+
+    function getPostKey(post) {
+      return String(post.postId || `${post.createdAt || ''}:${post.title || ''}`);
+    }
+
+    function getPostPreview(content, isExpanded) {
+      const text = String(content || 'No content');
+      const limit = window.matchMedia('(max-width: 600px)').matches ? 220 : 360;
+      const canToggle = text.length > limit;
+      return {
+        text: !isExpanded && canToggle ? text.slice(0, limit).trimEnd() : text,
+        isTruncated: !isExpanded && canToggle,
+        canToggle
+      };
+    }
+
+    function togglePostPreview(postKey) {
+      if (state.expandedPostIds.has(postKey)) {
+        state.expandedPostIds.delete(postKey);
+      } else {
+        state.expandedPostIds.add(postKey);
+      }
+      renderCommunity();
+    }
+
+    function getFilteredSortedPosts() {
+      const searchTerm = state.postSearch.trim().toLocaleLowerCase();
+      const filtered = state.posts.filter(post => {
+        if (state.postFilter !== 'all' && getPostCategory(post) !== state.postFilter) return false;
+        if (!searchTerm) return true;
+
+        const searchableText = [
+          post.title,
+          post.content,
+          post.author?.fullName,
+          getCategoryLabel(getPostCategory(post))
+        ].filter(Boolean).join(' ').toLocaleLowerCase();
+        return searchableText.includes(searchTerm);
+      });
+
+      return filtered.sort((a, b) => {
+        if (state.postSort === 'upvotes') return (b.upvotes || 0) - (a.upvotes || 0);
+        if (state.postSort === 'comments') return (Number(b.commentsCount || 0)) - (Number(a.commentsCount || 0));
+        const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return bTime - aTime;
+      });
+    }
+
+    function formatPostForCopy(post) {
+      const author = post.author?.fullName || 'Community member';
+      const date = post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Unknown date';
+      return `${post.title || 'Untitled post'}\nBy ${author} • ${date}\n\n${post.content || 'No content'}`;
+    }
+
+    async function copyCommunityPosts() {
+      const posts = getFilteredSortedPosts();
+      const button = document.getElementById('copy-posts');
+      if (!posts.length) {
+        if (button) button.textContent = 'No matching posts';
+        return;
+      }
+
+      const text = posts.map(formatPostForCopy).join('\n\n────────────────────\n\n');
+      try {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          const textArea = document.createElement('textarea');
+          textArea.value = text;
+          textArea.style.position = 'fixed';
+          textArea.style.opacity = '0';
+          document.body.appendChild(textArea);
+          textArea.select();
+          document.execCommand('copy');
+          textArea.remove();
+        }
+        if (button) {
+          button.textContent = `Copied ${posts.length} post${posts.length === 1 ? '' : 's'}`;
+          window.setTimeout(() => { button.textContent = 'Copy all posts'; }, 2200);
+        }
+      } catch (error) {
+        console.error('Could not copy posts', error);
+        if (button) button.textContent = 'Copy failed';
+      }
+    }
+
+    function renderCommunity() {
+      const el = document.getElementById('posts-list');
+      const moreEl = document.getElementById('posts-more');
+      const filterEl = document.getElementById('post-filter');
+      if (!el) return;
+
+      const categoryMap = {};
+      state.posts.forEach(post => {
+        const key = getPostCategory(post);
+        categoryMap[key] = categoryMap[key] || { count: 0, label: key === 'general' ? 'General' : getCategoryLabel(key) };
+        categoryMap[key].count++;
+      });
+
+      if (filterEl) {
+        const current = filterEl.value;
+        filterEl.innerHTML = '<option value="all">All posts</option>' + Object.entries(categoryMap)
+          .sort((a, b) => b[1].count - a[1].count)
+          .map(([key, meta]) => `<option value="${escapeHtml(key)}">${escapeHtml(meta.label)} (${meta.count})</option>`)
+          .join('');
+        filterEl.value = current && categoryMap[current] ? current : state.postFilter;
+      }
+
+      const sorted = getFilteredSortedPosts();
+
+      if (!sorted.length) {
+        el.innerHTML = '<div class="empty-state">No community posts found.</div>';
+        if (moreEl) {
+          moreEl.style.display = 'none';
+          moreEl.innerHTML = '';
+        }
+        return;
+      }
+
+      const visible = sorted.slice(0, state.visiblePostCount);
+
+      el.innerHTML = visible.map(post => {
+        const author = post.author?.fullName || 'Community member';
+        const date = post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Unknown date';
+        const content = post.content || 'No content';
+        const postKey = getPostKey(post);
+        const isExpanded = state.expandedPostIds.has(postKey);
+        const preview = getPostPreview(content, isExpanded);
+        const attachments = post.attachments || [];
+        const links = post.links || [];
+        const comments = Array.isArray(post.comments) ? post.comments : [];
+        const commentCount = Number(post.commentsCount || comments.length || 0);
+        const commentFallback = commentCount > 0
+          ? 'This export includes comment counts, but the nested comment threads are not included here. Showing the count only.'
+          : 'No comments are included in this export yet.';
+
+        return `
+          <article class="post-card">
+            <div class="post-header">
+              <div class="author-name">${escapeHtml(author)}</div>
+              <div class="post-date">${escapeHtml(date)}</div>
+            </div>
+            <div class="post-title">${escapeHtml(post.title || 'Untitled post')}</div>
+            <div class="post-body">${escapeHtml(preview.text)}${preview.isTruncated ? '…' : ''}</div>
+            ${preview.canToggle ? `<button class="post-more" type="button" data-post-preview-toggle="${escapeHtml(postKey)}" aria-expanded="${isExpanded}">${isExpanded ? 'Show less' : '… more'}</button>` : ''}
+
+            ${attachments.length ? `<div class="section-box" style="margin-top: 16px; padding: 14px 16px;"><h3>Attachments</h3><div class="attachment-list">${attachments.map(a => {
+              const downloadUrl = resolveAttachmentUrl(a);
+              return `<div class="attachment-item"><a href="${downloadUrl || '#'}" target="_blank" rel="noopener noreferrer">${escapeHtml(a.fileName || 'Attachment')}</a><div class="attachment-meta">${escapeHtml((a.fileType || a.extension || 'file').toUpperCase())}${a.fileSizeBytes ? ' • ' + formatBytes(a.fileSizeBytes) : ''}</div></div>`;
+            }).join('')}</div></div>` : ''}
+
+            ${links.length ? `<div class="section-box" style="margin-top: 16px; padding: 14px 16px;"><h3>Links</h3><div class="attachment-list">${links.map(l => `<div class="attachment-item"><a href="${l.url || '#'}" target="_blank" rel="noopener noreferrer">${escapeHtml((l.url || 'Link').replace(/^https?:\/\//, ''))}</a><div class="attachment-meta">${escapeHtml(l.platform || 'External link')}</div></div>`).join('')}</div></div>` : ''}
+
+            <div class="section-box" style="margin-top: 16px; padding: 14px 16px;">
+              <h3>Comments (${commentCount})</h3>
+              ${comments.length ? `<div class="comment-list">${comments.map(c => `<div class="comment-item"><div class="comment-meta"><strong>${escapeHtml(c.author?.fullName || c.user?.fullName || 'Member')}</strong> • ${escapeHtml(c.createdAt ? new Date(c.createdAt).toLocaleDateString() : '')}</div><div class="comment-body">${escapeHtml(c.content || c.text || '')}</div></div>`).join('')}</div>` : `<div class="comment-meta">${escapeHtml(commentFallback)}</div>`}
+            </div>
+
+            <div class="post-stats">
+              <span>👍 ${post.upvotes || 0} upvotes</span>
+              <span>💬 ${commentCount} comments</span>
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      el.querySelectorAll('[data-post-preview-toggle]').forEach(button => {
+        button.addEventListener('click', () => togglePostPreview(button.dataset.postPreviewToggle));
+      });
+
+      const remaining = Math.max(0, sorted.length - visible.length);
+      if (moreEl) {
+        moreEl.style.display = remaining > 0 ? 'block' : 'none';
+        moreEl.innerHTML = remaining > 0 ? `<button type="button" style="background:#2563eb; color:white; border:none; border-radius:10px; padding:10px 18px; cursor:pointer; font-weight:700;" onclick="state.visiblePostCount += 30; renderCommunity();">Load more posts (${remaining})</button>` : '';
+      }
+    }
+
+    function openPost(postId) {
+      const post = state.posts.find(item => item.postId === postId);
+      if (!post) return;
+
+      const communityTab = document.getElementById('community-view');
+      const classroomTab = document.getElementById('classroom-view');
+      classroomTab.classList.remove('active');
+      communityTab.classList.add('active');
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.toggle('active', btn.textContent.toLowerCase().includes('community')));
+
+      const container = document.getElementById('posts-list');
+      const index = state.posts.indexOf(post);
+      if (index >= 0) {
+        container.scrollTo({ top: 0, behavior: 'smooth' });
+        const cards = container.querySelectorAll('.post-card');
+        if (cards[index]) cards[index].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function extractRichTextLinks(rawText) {
+      const links = [];
+      const seen = new Set();
+
+      if (!rawText) return links;
+
+      try {
+        const payload = String(rawText).startsWith('[v2]') ? String(rawText).slice(4) : String(rawText);
+        const parsed = JSON.parse(payload);
+
+        const walk = (node) => {
+          if (!node || typeof node !== 'object') return;
+          if (Array.isArray(node)) {
+            node.forEach(walk);
+            return;
+          }
+
+          if (Array.isArray(node.marks)) {
+            for (const mark of node.marks) {
+              const href = mark && mark.attrs && mark.attrs.href;
+              const text = typeof node.text === 'string' ? node.text.trim() : '';
+              if (href && text) {
+                const key = `${href}|${text}`;
+                if (!seen.has(key)) {
+                  seen.add(key);
+                  links.push({ title: text, url: href, platform: 'Booking link' });
+                }
+              }
+            }
+          }
+
+          Object.values(node).forEach(walk);
+        };
+
+        walk(parsed);
+      } catch (error) {
+        const directLinks = (String(rawText).match(/https?:\/\/[^\s"'<>]+/g) || []);
+        directLinks.forEach((url) => {
+          const key = url;
+          if (!seen.has(key)) {
+            seen.add(key);
+            links.push({ title: 'Book a session', url, platform: 'External link' });
+          }
+        });
+      }
+
+      return links;
+    }
+
+    function normalizePreviewUrl(url) {
+      return String(url || '').replace(/&attachment=true/gi, '').replace(/\?attachment=true/gi, '');
+    }
+
+    function resolveResourceUrl(resource, allowSkoolFileFallback = false) {
+      if (resource?.url) return normalizePreviewUrl(resource.url);
+      if (allowSkoolFileFallback && resource?.fileName && resource.platform === 'skool-file') {
+        return `/attachments/${encodeURIComponent(resource.fileName)}`;
+      }
+      return null;
+    }
+
+    function resolveAttachmentUrl(attachment) {
+      if (attachment?.url) return normalizePreviewUrl(attachment.url);
+      if (attachment?.fileName) {
+        return `/attachments/${encodeURIComponent(attachment.fileName)}`;
+      }
+      return null;
+    }
+
+    function formatBytes(bytes) {
+      if (!bytes || bytes < 1024) return `${bytes || 0} B`;
+      const units = ['KB', 'MB', 'GB'];
+      let size = bytes / 1024;
+      let unitIndex = 0;
+      while (size >= 1024 && unitIndex < units.length - 1) {
+        size /= 1024;
+        unitIndex++;
+      }
+      return `${size.toFixed(1)} ${units[unitIndex]}`;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+# Ignore heavy video files
+videos/
+*.mp4
+*.mkv
+*.mov
+
+# Ignore local Cloudflare/Wrangler state and private environment variables
+.wrangler/
+.env
+.env.*
+
+# Ignore temporary text files
+missing-audio-urls.txt
+external_doc_links.txt
+external_resources.txt
