@@ -1462,7 +1462,7 @@
     function resolveResourceUrl(resource, allowSkoolFileFallback = false) {
       if (resource?.url) return normalizePreviewUrl(resource.url);
       if (allowSkoolFileFallback && resource?.fileName && resource.platform === 'skool-file') {
-        return `/attachments/${encodeURIComponent(resource.fileName)}`;
+        return `attachments/${encodeURIComponent(resource.fileName)}`;
       }
       return null;
     }
@@ -1470,7 +1470,7 @@
     function resolveAttachmentUrl(attachment) {
       if (attachment?.url) return normalizePreviewUrl(attachment.url);
       if (attachment?.fileName) {
-        return `/attachments/${encodeURIComponent(attachment.fileName)}`;
+        return `attachments/${encodeURIComponent(attachment.fileName)}`;
       }
       return null;
     }
